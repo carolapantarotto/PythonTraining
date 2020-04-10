@@ -10,6 +10,8 @@ import random
 # DataSet of words
 global_dictionary = ["outside","squirrel", "straight", 
               "finger", "leaf", "frog", "mouth", "grandson"]
+MAX_LIVES = 6
+
 def hangmanGraphic (numberOfLives):
     if numberOfLives==6:
         print("_________")
@@ -20,7 +22,7 @@ def hangmanGraphic (numberOfLives):
         print("|")
         print("|")
         print("|_______")            
-    if numberOfLives==5:
+    elif numberOfLives==5:
         print("_________")
         print("|/   | ")
         print("|   (_)")
@@ -29,7 +31,7 @@ def hangmanGraphic (numberOfLives):
         print("|")
         print("|")
         print("|_______")  
-    if numberOfLives==4:
+    elif numberOfLives==4:
         print("_________")
         print("|/   | ")
         print("|   (_)")
@@ -38,7 +40,7 @@ def hangmanGraphic (numberOfLives):
         print("|")
         print("|")
         print("|_______") 
-    if numberOfLives==3:
+    elif numberOfLives==3:
         print("_________")
         print("|/   | ")
         print("|   (_)")
@@ -47,7 +49,7 @@ def hangmanGraphic (numberOfLives):
         print("|")
         print("|")
         print("|_______") 
-    if numberOfLives==2:
+    elif numberOfLives==2:
         print("_________")
         print("|/   | ")
         print("|   (_)")
@@ -56,7 +58,7 @@ def hangmanGraphic (numberOfLives):
         print("|")
         print("|")
         print("|_______") 
-    if numberOfLives==1:
+    elif numberOfLives==1:
         print("_________")
         print("|/   | ")
         print("|   (_)")
@@ -65,7 +67,7 @@ def hangmanGraphic (numberOfLives):
         print("|   / ")
         print("|")
         print("|_______") 
-    if numberOfLives==0:
+    elif numberOfLives==0:
         print("_________")
         print("|/   | ")
         print("|   (_)")
@@ -75,7 +77,21 @@ def hangmanGraphic (numberOfLives):
         print("|")
         print("|_______") 
 
+def guessPrint(lives, known_word, letter):
+    # BE: Display word i.e. hangman: h _ _ _ _ _ _ 
+        print ("You have %s lives left!" % (lives))
+        hangmanGraphic(lives)
+        print ("Guess the word: ", known_word)
+    # User: Letter in input
+        letter = input("Guess a letter: ")
+        return letter
 
+def printWinMessage(known_word):
+    print("\n")
+    print("*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*")
+    print("You win! The word is: %s !" % (known_word))
+    print("_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_")
+            
 def coolDisplay(word, known_bool):
     cool_word = word[0]
     #Build known_word | known_word = "h _ _ _ _ _ _"
@@ -88,26 +104,21 @@ def coolDisplay(word, known_bool):
 
 def main ():
 # Start of the program
-    lives = 6
+    lives = MAX_LIVES
+    letter = ""
 # BE: Choose the word
     secret_word = (random.choices(global_dictionary))[0]
-    known_bool = [0]*len(secret_word)
-    known_bool[0] = 1
+    known_bool = [False]*len(secret_word)
+    known_bool[0] = True
     #Build known_word | known_word = "h _ _ _ _ _ _"
     known_word = coolDisplay(secret_word, known_bool)
 # Loop
     while (lives>0):
-        if (sum(known_bool)==len(secret_word)):
-            print("*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*")
-            print("You win! The word is: %s !" % (known_word))
-            print("_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_")
+        if all(known_bool):
+            printWinMessage(known_word)
             break
     # BE: Display word i.e. hangman: h _ _ _ _ _ _ 
-        print ("You have %s lives left!" % (lives))
-        hangmanGraphic(lives)
-        print ("Guess the word: ", known_word)
-    # User: Letter in input
-        letter = input("Guess a letter: ")
+        letter = guessPrint(lives, known_word, letter)
     # BE: Check if the letter is part of the word
         save = False
         for i in range(1, len(secret_word), 1): #1 is included, len(secret_word) is excluded
@@ -117,18 +128,17 @@ def main ():
                 #       and update the known_bool
                 known_bool[i] = 1
                 save=True
-        if (save==False):# NO: Remove one life
+        if not save:# NO: Remove one life
             lives-=1
         known_word = coolDisplay(secret_word, known_bool)
 # End Loop
-    if (sum(known_bool)!=len(secret_word)):
+    if not all(known_bool):
         hangmanGraphic(lives)
         print ("You lose!")
                 
 print ("Welcome to the Hangman game!")
-start = "N"
-while (start != "Y"):
+start = ""
+while (start != "N"):
     start = input("Do you want to play (Y/N)? ")
     if start=="Y":
         main()
-        break
